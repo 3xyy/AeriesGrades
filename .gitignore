@@ -3,3 +3,4 @@ pnpm-lock.yaml
 .DS_Store
 
 prepare.sh
+Script/output.html
