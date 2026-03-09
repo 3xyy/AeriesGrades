@@ -97,11 +97,16 @@ There is no seperate dev/prod command, extension must be built to be tested.
 0.6.1
 - Bug fix: cache not resetting when student is switched.
 
+0.6.2
+- Fixed loading bug and improved switcher
+
+0.6.3
+- Add column sorting to assignment list in Period view, patch abandoned svelte-bundle
 ## Testing
 
 Here is how to test the extension:
 
-1. Go to aeries demo website: https://demo.aeries.net/AeriesTX/Login.aspx
+1. ~~Go to aeries demo website: https://demo.aeries.net AeriesTX/Login.aspx~~
 2. Click on the student link under the sign in button.
 3. Go through the sign in page, then you will be redirected to Aeries Student dashboard page.
 4. ~~Click on Go to Aeries Grades+ button to go to the grade viewer.~~ As of 0.5.0, Aeries Grades+ will show current terms on dashboard page.
