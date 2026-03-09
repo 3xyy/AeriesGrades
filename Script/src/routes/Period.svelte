@@ -772,7 +772,58 @@
 
     let height = 0;
 
-    let graphOpen = false;
+    let graphOpen = false;    // Sorting: col = 'due'|'name'|'completed'|'percent'|'score', dir = 'asc'|'desc'
+    let sortCol = 'due';
+    let sortDir = 'desc';
+    // Reactive key so Svelte re-evaluates sortedAssignments() calls in the template when sort state changes
+    $: sortKey = sortCol + sortDir;
+
+    function cycleSort(col) {
+        if (sortCol !== col) {
+            sortCol = col;
+            sortDir = 'desc';
+        } else if (sortDir === 'desc') {
+            sortDir = 'asc';
+        } else if (sortDir === 'asc') {
+            sortCol = 'due';
+            sortDir = 'desc';
+        }
+    }
+
+    function removeAssignment(category, assignment) {
+        const idx = category.assignments.indexOf(assignment);
+        if (idx !== -1) { category.assignments.splice(idx, 1); categories = categories; }
+    }
+
+    // sortKey param is unused but makes Svelte track sortCol/sortDir as reactive dependencies
+    function sortedAssignments(assignments, _sortKey) {
+        return [...assignments].sort((a, b) => {
+            let av, bv;
+            if (sortCol === 'due' || sortCol === 'completed') {
+                const da = a[sortCol];
+                const db = b[sortCol];
+                if (da === 'n/a' && db === 'n/a') return 0;
+                if (da === 'n/a') return 1;
+                if (db === 'n/a') return -1;
+                av = new Date(da).getTime();
+                bv = new Date(db).getTime();
+            } else if (sortCol === 'name') {
+                av = (a.name || '').toLowerCase();
+                bv = (b.name || '').toLowerCase();
+            } else if (sortCol === 'percent') {
+                av = a.percent === -1 ? -Infinity : a.percent;
+                bv = b.percent === -1 ? -Infinity : b.percent;
+            } else if (sortCol === 'score') {
+                const at = a.actual?.total ?? 0;
+                const bt = b.actual?.total ?? 0;
+                av = at === 0 ? -Infinity : (a.actual?.score ?? 0) / at;
+                bv = bt === 0 ? -Infinity : (b.actual?.score ?? 0) / bt;
+            }
+            if (av < bv) return sortDir === 'asc' ? -1 : 1;
+            if (av > bv) return sortDir === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
 </script>
 
 {#if !loading}
@@ -1225,34 +1276,62 @@
                                     {/if}
                                 {/if}
                             </div>
-                        </div>
-                        <div class="opacity-75 flex items-center -mb-2.5">
+                        </div>                        <div class="opacity-75 flex items-center -mb-2.5">
                             {#if width > 1000}
-                                <p class="w-[40%]">Name</p>
-                                <p class="w-[15%]">Due</p>
-                                <p class="w-[15%]">Completed</p>
-                                <p class="w-[10%]">Percent</p>
-                                <p class="w-[20%]">
-                                    Score
-                                </p>
+                                {@const mkBtn = (col, label, cls) => ({ col, label, cls })}
+                                {#each [
+                                    { col: 'name',      label: 'Name',      cls: 'w-[40%]' },
+                                    { col: 'due',       label: 'Due',       cls: 'w-[15%]' },
+                                    { col: 'completed', label: 'Completed', cls: 'w-[15%]' },
+                                    { col: 'percent',   label: 'Percent',   cls: 'w-[10%]' },
+                                    { col: 'score',     label: 'Score',     cls: 'w-[20%]' },
+                                ] as h}
+                                    <button on:click|preventDefault|stopPropagation={() => cycleSort(h.col)} class="{h.cls} text-left flex items-center gap-0.5 hover:opacity-100">
+                                        {h.label}
+                                        {#if sortCol === h.col}
+                                            <span class="text-xs">{sortDir === 'desc' ? '↓' : '↑'}</span>
+                                        {/if}
+                                    </button>
+                                {/each}
                             {:else if width > 800}
-                                <p class="w-1/3">Name</p>
-                                <p class="w-1/5">Due</p>
-                                <p class="w-1/6">Percent</p>
-                                <p class="w-1/6">
-                                    Score
-                                </p>
+                                {#each [
+                                    { col: 'name',    label: 'Name',    cls: 'w-1/3' },
+                                    { col: 'due',     label: 'Due',     cls: 'w-1/5' },
+                                    { col: 'percent', label: 'Percent', cls: 'w-1/6' },
+                                    { col: 'score',   label: 'Score',   cls: 'w-1/6' },
+                                ] as h}
+                                    <button on:click|preventDefault|stopPropagation={() => cycleSort(h.col)} class="{h.cls} text-left flex items-center gap-0.5 hover:opacity-100">
+                                        {h.label}
+                                        {#if sortCol === h.col}
+                                            <span class="text-xs">{sortDir === 'desc' ? '↓' : '↑'}</span>
+                                        {/if}
+                                    </button>
+                                {/each}
                             {:else if width > 640}
-                                <p class="w-1/2">Name</p>
-                                <p class="w-1/6">Perecent</p>
-                                <p class="w-2/6">
-                                    Score
-                                </p>
+                                {#each [
+                                    { col: 'name',    label: 'Name',    cls: 'w-1/2' },
+                                    { col: 'percent', label: 'Percent', cls: 'w-1/6' },
+                                    { col: 'score',   label: 'Score',   cls: 'w-2/6' },
+                                ] as h}
+                                    <button on:click|preventDefault|stopPropagation={() => cycleSort(h.col)} class="{h.cls} text-left flex items-center gap-0.5 hover:opacity-100">
+                                        {h.label}
+                                        {#if sortCol === h.col}
+                                            <span class="text-xs">{sortDir === 'desc' ? '↓' : '↑'}</span>
+                                        {/if}
+                                    </button>
+                                {/each}
                             {:else}
-                                <p class="w-[62%]">Name</p>
-                                <p class="w-[38%]">
-                                    Score
-                                </p>
+                                {#each [
+                                    { col: 'name',  label: 'Name',  cls: 'w-[62%]' },
+                                    { col: 'score', label: 'Score', cls: 'w-[38%]' },
+                                ] as h}
+                                    <button on:click|preventDefault|stopPropagation={() => cycleSort(h.col)} class="{h.cls} text-left flex items-center gap-0.5 hover:opacity-100">
+                                        {h.label}
+                                        {#if sortCol === h.col}
+                                            <span class="text-xs">{sortDir === 'desc' ? '↓' : '↑'}</span>
+                                        {/if}
+                                    </button>
+                                {/each}
                             {/if}
                         </div>
                     </div>
@@ -1288,9 +1367,8 @@
                             </div>
                         </div>
                     {/if}
-                    
-                    <div class="mb-8 relative">
-                        {#each category.assignments as assignment, i}
+                      <div class="mb-8 relative">
+                        {#each sortedAssignments(category.assignments, sortKey) as assignment, i}
                             {#if assignment.fake == false}
                                 <Toggle let:open let:toggle>
                                     <button on:click|preventDefault|stopPropagation={() => { toggle(); }} class="w-full px-4 text-left mt-2 {(assignment.missing || (zeros && assignment.actual.score == 0 && assignment.percent != - 1)) && (!edit || (assignment.edit.score == 0)) ? "bg-red-500 dark:bg-red-500 bg-opacity-20 dark:bg-opacity-20" : $settings.mode == 'dark' ? "bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "bg-zinc-900 bg-opacity-10" : "bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"} rounded-md p-3">
@@ -1564,7 +1642,7 @@
                                                 <input bind:value={assignment.edit.score} on:keydown={(event) => { if(event.keyCode == 13) { event.preventDefault(); } }} class="w-10 text-right mx-[0.22rem] bg-zinc-100 bg-opacity-0">/
                                                 <input bind:value={assignment.edit.total} on:keydown={(event) => { if(event.keyCode == 13) { event.preventDefault(); } }} class="w-10 text-left mx-[0.22rem] bg-zinc-100 bg-opacity-0">
                                             </div>
-                                            <button aria-label="Delete" on:click|preventDefault|stopPropagation={() => { category.assignments.splice(i, 1); categories = categories; }} class="scale-75 {$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} -my-0.5">
+                                            <button aria-label="Delete" on:click|preventDefault|stopPropagation={() => { removeAssignment(category, assignment); }} class="scale-75 {$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} -my-0.5">
                                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
                                             </button>
                                         </div>
@@ -1581,7 +1659,7 @@
                                                 <input bind:value={assignment.edit.score} on:keydown={(event) => { if(event.keyCode == 13) { event.preventDefault(); } }} class="w-10 text-right mx-[0.22rem] bg-zinc-100 bg-opacity-0">/
                                                 <input bind:value={assignment.edit.total} on:keydown={(event) => { if(event.keyCode == 13) { event.preventDefault(); } }} class="w-10 text-left mx-[0.22rem] bg-zinc-100 bg-opacity-0">
                                             </div>
-                                            <button aria-label="Delete" on:click|preventDefault|stopPropagation={() => { category.assignments.splice(i, 1); categories = categories; }} class="scale-75 {$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} -my-0.5">
+                                            <button aria-label="Delete" on:click|preventDefault|stopPropagation={() => { removeAssignment(category, assignment); }} class="scale-75 {$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} -my-0.5">
                                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
                                             </button>
                                         </div>
@@ -1597,7 +1675,7 @@
                                                 <input bind:value={assignment.edit.score} on:keydown={(event) => { if(event.keyCode == 13) { event.preventDefault(); } }} class="w-10 text-right mx-[0.22rem] bg-zinc-100 bg-opacity-0">/
                                                 <input bind:value={assignment.edit.total} on:keydown={(event) => { if(event.keyCode == 13) { event.preventDefault(); } }} class="w-10 text-left mx-[0.22rem] bg-zinc-100 bg-opacity-0">
                                             </div>
-                                            <button aria-label="Delete" on:click|preventDefault|stopPropagation={() => { category.assignments.splice(i, 1); categories = categories; }} class="scale-75 {$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} -my-0.5">
+                                            <button aria-label="Delete" on:click|preventDefault|stopPropagation={() => { removeAssignment(category, assignment); }} class="scale-75 {$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} -my-0.5">
                                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
                                             </button>
                                         </div>
@@ -1610,7 +1688,7 @@
                                                 <input bind:value={assignment.edit.score} on:keydown={(event) => { if(event.keyCode == 13) { event.preventDefault(); } }} class="w-10 text-right mx-[0.22rem] bg-zinc-100 bg-opacity-0">/
                                                 <input bind:value={assignment.edit.total} on:keydown={(event) => { if(event.keyCode == 13) { event.preventDefault(); } }} class="w-10 text-left mx-[0.22rem] bg-zinc-100 bg-opacity-0">
                                             </div>
-                                            <button aria-label="Delete" on:click|preventDefault|stopPropagation={() => { category.assignments.splice(i, 1); categories = categories; }} class="scale-75 {$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} -my-0.5">
+                                            <button aria-label="Delete" on:click|preventDefault|stopPropagation={() => { removeAssignment(category, assignment); }} class="scale-75 {$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} -my-0.5">
                                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
                                             </button>
                                         </div>
