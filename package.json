@@ -10,8 +10,12 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
+  "license": "ISC",  "devDependencies": {
     "nodemon": "^3.1.7"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "svelte-bundle@0.0.24": "patches/svelte-bundle@0.0.24.patch"
+    }
   }
 }

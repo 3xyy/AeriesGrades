@@ -1,0 +1,55 @@
+diff --git a/bundle.js b/bundle.js
+index 1f1d773..72c3ef0 100644
+--- a/bundle.js
++++ b/bundle.js
+@@ -11,7 +11,7 @@ import postcss from 'postcss';
+ import tailwindcss from 'tailwindcss';
+ import autoprefixer from 'autoprefixer';
+ import cssnano from 'cssnano';
+-import { fileURLToPath } from 'url';
++import { fileURLToPath, pathToFileURL } from 'url';
+ import { createRequire } from 'module';
+ 
+ const require = createRequire(import.meta.url);
+@@ -69,8 +69,8 @@ export async function buildStaticFile(svelteFilePath, outputDir, options = {}) {
+       globalCssText = processedCss.css;
+     }
+ 
+-    // Get the absolute path to svelte/internal
+-    const svelteInternalPath = require.resolve('svelte/internal');
++    // Get the absolute path to svelte/internal (as a file:// URL for Windows compatibility)
++    const svelteInternalPath = pathToFileURL(require.resolve('svelte/internal')).href;
+     
+     // Create temporary SSR bundle
+     const ssrBundle = await rollup({
+@@ -124,7 +124,7 @@ export async function buildStaticFile(svelteFilePath, outputDir, options = {}) {
+     });
+ 
+     // Import the SSR bundle using dynamic import
+-    const { default: App } = await import(/* @vite-ignore */`file://${tempSSRFile}`);
++    const { default: App } = await import(/* @vite-ignore */pathToFileURL(tempSSRFile).href);
+     const { html: initialHtml } = App.render();
+ 
+     // Clean up temp files
+diff --git a/cli.js b/cli.js
+index 75b8c12..a369654 100644
+--- a/cli.js
++++ b/cli.js
+@@ -5,7 +5,7 @@ import path from 'path';
+ import fs from 'fs/promises';
+ import { createInterface } from 'readline';
+ import { buildStaticFile } from './bundle.js';
+-import { fileURLToPath } from 'url';
++import { fileURLToPath, pathToFileURL } from 'url';
+ 
+ // Get package.json data
+ import { readFile } from 'fs/promises';
+@@ -51,7 +51,7 @@ const options = program.opts();
+ async function loadTailwindConfig(configPath) {
+   const fullPath = path.resolve(configPath);
+   try {
+-    const { default: config } = await import(fullPath);
++    const { default: config } = await import(pathToFileURL(fullPath).href);
+     return config;
+   } catch (error) {
+     console.error(chalk.red(`Error loading Tailwind config: ${error.message}`));
