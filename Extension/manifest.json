@@ -1,16 +1,15 @@
 {
     "manifest_version": 3,
     "name": "Aeries Grades+",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "author": "Alejandro Estrella",
     "description": "An improved grade viewer for Aeries.",
-    "permissions": [
-      
-    ],
-     "host_permissions": [
+    "permissions": [],
+    "host_permissions": [
         "https://*.aeries.net/*/GradebookSummary.aspx*",
         "https://*.aeries.net/*/GradebookDetails.aspx*",
-        "https://*.aeries.net/*/Dashboard.aspx*"
+        "https://*.aeries.net/*/Dashboard.aspx*",
+        "https://*.aeries.net/*/LoginParent.aspx*"
     ],
     "icons": {
         "128": "info.png"
@@ -19,30 +18,45 @@
         {
             "run_at": "document_end",
             "matches": [
-              "https://*.aeries.net/*/GradebookSummary.aspx*",
-              "https://*.aeries.net/*/GradebookDetails.aspx*",
-              "https://*.aeries.net/*/Dashboard.aspx*"
+                "https://*.aeries.net/*/GradebookSummary.aspx*",
+                "https://*.aeries.net/*/GradebookDetails.aspx*",
+                "https://*.aeries.net/*/Dashboard.aspx*"
             ],
-            "js": ["script.js"],
+            "js": [
+                "script.js"
+            ],
             "all_frames": true,
             "world": "MAIN"
         },
         {
             "run_at": "document_end",
             "matches": [
-              "https://*.aeries.net/*/GradebookSummary.aspx*",
-              "https://*.aeries.net/*/GradebookDetails.aspx*",
-              "https://*.aeries.net/*/Dashboard.aspx*"
+                "https://*.aeries.net/*/GradebookSummary.aspx*",
+                "https://*.aeries.net/*/GradebookDetails.aspx*",
+                "https://*.aeries.net/*/Dashboard.aspx*"
             ],
-            "js": ["tailwindcss.js"],
+            "js": [
+                "tailwindcss.js"
+            ],
+            "all_frames": true,
+            "world": "MAIN"
+        },
+        {
+            "run_at": "document_end",
+            "matches": [
+                "https://*.aeries.net/*/LoginParent.aspx*"
+            ],
+            "js": [
+                "autologin.js"
+            ],
             "all_frames": true,
             "world": "MAIN"
         }
     ],
     "browser_specific_settings": {
-      "gecko": {
-        "id": "aaeriesgradesextensionself@example.com",
-        "update_url": "https://ahsengineering.org/updates.json"
-      }
+        "gecko": {
+            "id": "aaeriesgradesextensionself@example.com",
+            "update_url": "https://ahsengineering.org/updates.json"
+        }
     }
-  }
+}

@@ -40,7 +40,7 @@
 
 <div class="p-8 {$settings.mode == 'dark' ? "bg-zinc-900 text-white" : $settings.mode == 'light' ? "bg-zinc-100 text-black" : "bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white"}  h-full w-full relative rounded-lg">
 
-    <a class="px-4 py-3 mb-6 w-fit block rounded-md {$settings.mode == 'dark' ? "bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "bg-zinc-900 bg-opacity-10" : "bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"}" href={location.href.substring(0, location.href.lastIndexOf("/") + 1) + "GradebookSummary.aspx"}>
+    <a class="px-4 py-3 mb-6 w-fit block rounded-md {$settings.mode == 'dark' ? "bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "bg-zinc-900 bg-opacity-10" : "bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"}" href={location.href.substring(0, location.href.lastIndexOf("/") + 1) + "GradebookSummary.aspx"} on:click={() => { sessionStorage.removeItem("auto-redirecting"); }}>
         View All Grades
     </a>
 

@@ -102,6 +102,10 @@ There is no seperate dev/prod command, extension must be built to be tested.
 
 0.6.3
 - Add column sorting to assignment list in Period view, patch abandoned svelte-bundle
+
+0.6.4
+- Add auto login with multiple methods, auto redirect, single version number source of truth, ui changes
+
 ## Testing
 
 Here is how to test the extension:

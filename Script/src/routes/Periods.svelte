@@ -4,6 +4,7 @@
     import { persisted } from 'svelte-persisted-store'
     import Tooltip from "./Tooltip.svelte";
     import { scrapPeriods } from "./periods";
+    import { VERSION } from "./version.js";
 
     export let started;
     export let settings;
@@ -57,15 +58,13 @@
         </button>
 
         <div transition:fade={{ duration: 100 }} class="absolute z-[5] p-6 {$settings.mode == 'dark' ? "bg-zinc-900" : $settings.mode == 'light' ? "bg-zinc-100" : "bg-zinc-100 dark:bg-zinc-900"} rounded-3xl max-w-[calc(100%-2rem)] w-[36rem] min-h-[24rem] max-h-[calc(100%-6rem)] left-1/2 top-10 -translate-x-1/2 overflow-auto">
-            <p class="text-2xl font-bold mb-4">Settings</p>
-
-            <div class="flex items-center justify-between relative">
+            <p class="text-2xl font-bold mb-4">Settings</p>            <div class="flex items-center justify-between relative">
                 <p class="text-lg">Appearance</p>
 
                 <select bind:value={$settings.mode} name="mode" id="mode" class="disabled:cursor-not-allowed {$settings.mode == 'dark' ? "text-white bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "text-black bg-zinc-900 bg-opacity-10" : "text-black dark:text-white bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"} rounded-md text-lg px-3 pr-8 py-1.5  bg-none w-28">
-                    <option value="default">System</option>
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="default">System</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="dark">Dark</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="light">Light</option>
                 </select>     
                 
                 <div class="{$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -77,8 +76,8 @@
                 <p class="text-lg">Mark Zeros as Missing</p>
 
                 <select bind:value={$settings.zeros} name="zeros" id="zeros" class="disabled:cursor-not-allowed {$settings.mode == 'dark' ? "text-white bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "text-black bg-zinc-900 bg-opacity-10" : "text-black dark:text-white bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"} rounded-md text-lg px-3 pr-8 py-1.5  bg-none w-28">
-                    <option value="no">No</option>
-                    <option value="yes">Yes</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="no">No</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="yes">Yes</option>
                 </select>     
                 
                 <div class="{$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -90,10 +89,71 @@
                 <p class="text-lg">Developer Mode</p>
 
                 <select bind:value={$settings.developer} name="developer" id="developer" class="disabled:cursor-not-allowed {$settings.mode == 'dark' ? "text-white bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "text-black bg-zinc-900 bg-opacity-10" : "text-black dark:text-white bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"} rounded-md text-lg px-3 pr-8 py-1.5  bg-none w-28">
-                    <option value="off">Off</option>
-                    <option value="on">On</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="off">Off</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="on">On</option>
                 </select>     
                 
+                <div class="{$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-360 280-560h400L480-360Z"/></svg>
+                </div>            </div><div class="flex items-center justify-between relative mt-2">
+                <p class="text-lg">Auto Login</p>
+
+                <select bind:value={$settings.autologin} name="autologin" id="autologin" class="disabled:cursor-not-allowed {$settings.mode == 'dark' ? "text-white bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "text-black bg-zinc-900 bg-opacity-10" : "text-black dark:text-white bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"} rounded-md text-lg px-3 pr-8 py-1.5  bg-none w-28">
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="off">Off</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="on">On</option>
+                </select>
+
+                <div class="{$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-360 280-560h400L480-360Z"/></svg>
+                </div>            </div>            {#if $settings.autologin == "on"}
+                <div class="mt-3 flex flex-col gap-2">
+                    <div class="flex items-center justify-between relative">
+                        <p class="text-base">Login Mode</p>
+                        
+                        <select bind:value={$settings.autologin_mode} name="autologin_mode" id="autologin_mode" class="disabled:cursor-not-allowed {$settings.mode == 'dark' ? "text-white bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "text-black bg-zinc-900 bg-opacity-10" : "text-black dark:text-white bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"} rounded-md text-base px-3 pr-8 py-1.5  bg-none w-32">
+                            <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="google">Google</option>
+                            <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="password">Password</option>
+                        </select>
+                        
+                        <div class="{$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-360 280-560h400L480-360Z"/></svg>
+                        </div>
+                    </div>
+                    
+                    {#if $settings.autologin_mode == "google"}
+                        <p class="text-sm opacity-75">Enter your school email to automatically sign in with Google.</p>
+                    {:else}
+                        <p class="text-sm opacity-75">Enter your Aeries credentials to automatically sign in.</p>
+                    {/if}
+                    
+                    <div class="relative">
+                        <input
+                            bind:value={$settings.autologin_email}
+                            type="email"
+                            placeholder="{$settings.autologin_mode == 'google' ? 'youremail@example.com' : 'Email'}"
+                            class="w-full rounded-lg p-3 {$settings.mode == 'dark' ? "bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "bg-zinc-900 bg-opacity-10" : "bg-zinc-900 bg-opacity-10 dark:bg-zinc-100 dark:bg-opacity-10"}"
+                        />
+                    </div>
+                    
+                    {#if $settings.autologin_mode == "password"}
+                        <div class="relative">
+                            <input
+                                bind:value={$settings.autologin_password}
+                                type="password"
+                                placeholder="Password"
+                                class="w-full rounded-lg p-3 {$settings.mode == 'dark' ? "bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "bg-zinc-900 bg-opacity-10" : "bg-zinc-900 bg-opacity-10 dark:bg-zinc-100 dark:bg-opacity-10"}"
+                            />
+                        </div>
+                    {/if}
+                </div>
+            {/if}<div class="flex items-center justify-between relative mt-2">
+                <p class="text-lg">Auto Gradebook Redirect</p>
+
+                <select bind:value={$settings.autogradebook} name="autogradebook" id="autogradebook" class="disabled:cursor-not-allowed {$settings.mode == 'dark' ? "text-white bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "text-black bg-zinc-900 bg-opacity-10" : "text-black dark:text-white bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"} rounded-md text-lg px-3 pr-8 py-1.5  bg-none w-28">
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="off">Off</option>
+                    <option class="{$settings.mode == 'dark' ? 'bg-zinc-900 text-white' : $settings.mode == 'light' ? 'bg-zinc-100 text-black' : 'bg-zinc-100 dark:bg-zinc-900 text-black dark:text-white'}" value="on">On</option>
+                </select>
+
                 <div class="{$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"} absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-360 280-560h400L480-360Z"/></svg>
                 </div>
@@ -111,11 +171,10 @@
                         <div class="scale-75 inline-block {$settings.mode === "dark" ? "fill-white" : $settings.mode === "light" ? "fill-black" : "fill-black dark:fill-white"} -mb-0.5 -my-0.5">
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/></svg>
                         </div>
-                    </button>
-                {/if}
+                    </button>                {/if}
             </div>
 
-            <p class="mt-2 text-right text-sm opacity-75">Version 0.6.3</p>
+            <p class="mt-2 text-right text-sm opacity-75">Version {VERSION}</p>
         
             <button aria-label="Close Settings" on:click|preventDefault={() => { settingsOpen = false }} class="p-1 transition-all rounded-full {$settings.mode == 'dark' ? "bg-zinc-100 bg-opacity-10" : $settings.mode == 'light' ? "bg-zinc-900 bg-opacity-10" : "bg-zinc-900 dark:bg-zinc-100 bg-opacity-10 dark:bg-opacity-10"} absolute top-6 right-6">
                 <div class="{$settings.mode == 'dark' ? "fill-white" : $settings.mode == 'light' ? "fill-black" : "fill-black dark:fill-white"}">
